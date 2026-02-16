@@ -50,6 +50,8 @@ GANNs-with-freinds/
 │   └── download_celeba.py        # Dataset download script
 ├── config/
 │   └── config.yaml.template      # Configuration template
+├── notebooks/
+│   └── demo_trained_model.ipynb  # Demo notebook for visualizing results
 ├── data/                         # CelebA dataset goes here
 ├── outputs/
 │   ├── samples/                  # Generated image samples
@@ -124,11 +126,22 @@ Want to train the same model locally without the distributed setup? Great for ex
    - Generated samples: `outputs_local/samples/`
    - Checkpoints: `outputs_local/checkpoints/`
 
+4. **View results** (after training)
+   ```bash
+   # Open the demo notebook in Jupyter
+   jupyter notebook notebooks/demo_trained_model.ipynb
+   ```
+   The notebook shows:
+   - Training curves (loss plots)
+   - Generated face samples
+   - Training progression over time
+
 ### For Instructor (Main Coordinator)
 
 1. **Setup PostgreSQL database**
-   - Deploy containerized PostgreSQL (provided separately)
-   - Note connection details
+   - Deploy public facing SQL database
+   - Create credentials for each student
+   - Create shared table
 
 2. **Follow student setup steps 1-5**
 
@@ -152,6 +165,12 @@ Want to train the same model locally without the distributed setup? Great for ex
    - Generated samples appear in `outputs/samples/`
    - Check database for worker statistics
    - Training stops automatically when complete
+
+6. **View results** (after training)
+   ```bash
+   jupyter notebook notebooks/demo_trained_model.ipynb
+   ```
+   The demo notebook visualizes training results and generates new faces.
 
 ## 📋 Requirements
 

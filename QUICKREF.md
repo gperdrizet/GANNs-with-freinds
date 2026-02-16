@@ -11,10 +11,7 @@ cd GANNs-with-freinds
 # 2. Open in VS Code Dev Container
 # Click "Reopen in Container" when prompted
 
-# 3. Run setup script
-bash scripts/setup.sh
-
-# OR do it manually:
+# 3. Install dependencies and setup
 pip install -r requirements.txt
 cp config/config.yaml.template config/config.yaml
 
@@ -80,12 +77,9 @@ ls -ltr outputs_local/samples/
 ls -ltr outputs_local/checkpoints/
 ```
 
-### Quick Comparison Test
+### Quick Test
 ```bash
-# Run the comparison helper script
-bash scripts/compare_training.sh
-
-# Or manually test local training (1 epoch)
+# Test local training (1 epoch)
 cd src
 python train_local.py --epochs 1 --batch-size 64
 ```
@@ -100,6 +94,33 @@ python train_local.py --epochs 1 --batch-size 64
 # - Faster per-iteration (no network)
 # - Baseline for comparison
 # - Good for experimentation
+```
+
+## Viewing Results
+
+### Demo Notebook
+```bash
+# After training, visualize results with the demo notebook
+jupyter notebook notebooks/demo_trained_model.ipynb
+
+# Or use JupyterLab
+jupyter lab notebooks/demo_trained_model.ipynb
+```
+
+**What the notebook shows:**
+- Training loss curves (G and D losses)
+- Grid of generated face images
+- Training progression over epochs
+- Interactive face generation
+
+### Quick View
+```bash
+# Just look at sample images
+ls -ltr outputs_local/samples/  # Local training
+ls -ltr outputs/samples/        # Distributed training
+
+# View latest sample
+xdg-open outputs_local/samples/epoch_*.png  # Linux
 ```
 
 ## For Instructor (Main Coordinator)
