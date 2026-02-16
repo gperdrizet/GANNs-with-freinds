@@ -53,11 +53,21 @@ def download_celeba(output_dir='./data'):
         print('Install it with: pip install torchvision')
         return False
     except Exception as e:
+        error_msg = str(e)
         print(f'\nERROR: Download failed: {e}')
-        print('\nTroubleshooting:')
-        print('  - Check your internet connection')
-        print('  - Ensure you have enough disk space (~1.5 GB)')
-        print('  - Try running the script again')
+        
+        # Check for gdown dependency
+        if 'gdown' in error_msg.lower():
+            print('\nThe CelebA dataset is hosted on Google Drive, which requires gdown.')
+            print('Install it with:')
+            print('  pip install gdown')
+            print('\nOr install all dependencies:')
+            print('  pip install -r requirements.txt')
+        else:
+            print('\nTroubleshooting:')
+            print('  - Check your internet connection')
+            print('  - Ensure you have enough disk space (~1.5 GB)')
+            print('  - Try running the script again')
         return False
 
 
