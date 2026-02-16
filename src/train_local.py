@@ -60,7 +60,7 @@ class LocalTrainer:
         self.checkpoints_dir.mkdir(parents=True, exist_ok=True)
         
         # Load dataset
-        print(f"Loading dataset from {dataset_path}...")
+        print(f'Loading dataset from {dataset_path}...')
         dataset = CelebADataset(dataset_path, image_size=image_size)
         self.dataloader = DataLoader(
             dataset,
@@ -70,10 +70,10 @@ class LocalTrainer:
             pin_memory=True,
             drop_last=True
         )
-        print(f"Dataset loaded: {len(dataset)} images")
+        print(f'Dataset loaded: {len(dataset)} images')
         
         # Initialize models
-        print("Initializing models...")
+        print('Initializing models...')
         self.generator = Generator(latent_dim=latent_dim).to(self.device)
         self.discriminator = Discriminator().to(self.device)
         
@@ -99,9 +99,9 @@ class LocalTrainer:
         self.g_losses = []
         self.d_losses = []
         
-        print("Local trainer initialized successfully!")
-        print(f"Generator parameters: {sum(p.numel() for p in self.generator.parameters()):,}")
-        print(f"Discriminator parameters: {sum(p.numel() for p in self.discriminator.parameters()):,}")
+        print('Local trainer initialized successfully!')
+        print(f'Generator parameters: {sum(p.numel() for p in self.generator.parameters()):,}')
+        print(f'Discriminator parameters: {sum(p.numel() for p in self.discriminator.parameters()):,}')
     
     def train_epoch(self, epoch: int):
         """Train for one epoch.
@@ -184,9 +184,9 @@ class LocalTrainer:
                 d_real_acc = epoch_d_real_correct / total_samples
                 d_fake_acc = epoch_d_fake_correct / total_samples
                 
-                print(f"  [{batch_idx + 1}/{len(self.dataloader)}] "
-                      f"G_loss: {avg_g_loss:.4f} | D_loss: {avg_d_loss:.4f} | "
-                      f"D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}")
+                print(f'  [{batch_idx + 1}/{len(self.dataloader)}] '
+                      f'G_loss: {avg_g_loss:.4f} | D_loss: {avg_d_loss:.4f} | '
+                      f'D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}')
         
         # Calculate epoch averages
         num_batches = len(self.dataloader)
@@ -197,7 +197,7 @@ class LocalTrainer:
         
         epoch_time = time.time() - start_time
         
-        print(f"\nEpoch {epoch} completed in {format_time(epoch_time)}")
+        print(f'\nEpoch {epoch} completed in {format_time(epoch_time)}')
         print_training_stats(
             iteration=epoch,
             epoch=epoch,
@@ -225,7 +225,7 @@ class LocalTrainer:
         
         output_path = self.samples_dir / f'epoch_{epoch:04d}.png'
         save_generated_images(fake_images, str(output_path))
-        print(f"Saved samples to {output_path}")
+        print(f'Saved samples to {output_path}')
     
     def save_checkpoint(self, epoch: int):
         """Save model checkpoint.
@@ -250,7 +250,7 @@ class LocalTrainer:
         latest_path = self.checkpoints_dir / 'checkpoint_latest.pth'
         torch.save(checkpoint, latest_path)
         
-        print(f"Saved checkpoint to {checkpoint_path}")
+        print(f'Saved checkpoint to {checkpoint_path}')
     
     def load_checkpoint(self, checkpoint_path: str):
         """Load model checkpoint.
@@ -261,7 +261,7 @@ class LocalTrainer:
         Returns:
             Starting epoch number
         """
-        print(f"Loading checkpoint from {checkpoint_path}...")
+        print(f'Loading checkpoint from {checkpoint_path}...')
         checkpoint = torch.load(checkpoint_path, map_location=self.device)
         
         self.generator.load_state_dict(checkpoint['generator_state_dict'])
@@ -272,7 +272,7 @@ class LocalTrainer:
         self.d_losses = checkpoint.get('d_losses', [])
         
         epoch = checkpoint['epoch']
-        print(f"Loaded checkpoint from epoch {epoch}")
+        print(f'Loaded checkpoint from epoch {epoch}')
         return epoch + 1
     
     def train(self, num_epochs: int, sample_interval: int = 1, checkpoint_interval: int = 5, resume: str = None):
@@ -289,20 +289,20 @@ class LocalTrainer:
         if resume:
             start_epoch = self.load_checkpoint(resume)
         
-        print("\n" + "="*70)
-        print("Starting Local DCGAN Training")
-        print("="*70)
-        print(f"Epochs: {num_epochs}")
-        print(f"Batch size: {self.batch_size}")
-        print(f"Batches per epoch: {len(self.dataloader)}")
-        print(f"Total images: {len(self.dataloader.dataset)}")
-        print(f"Device: {self.device}")
-        print("="*70)
+        print('\n' + '='*70)
+        print('Starting Local DCGAN Training')
+        print('='*70)
+        print(f'Epochs: {num_epochs}')
+        print(f'Batch size: {self.batch_size}')
+        print(f'Batches per epoch: {len(self.dataloader)}')
+        print(f'Total images: {len(self.dataloader.dataset)}')
+        print(f'Device: {self.device}')
+        print('='*70)
         
         try:
             for epoch in range(start_epoch, num_epochs):
                 print(f"\n{'='*70}")
-                print(f"Epoch {epoch + 1}/{num_epochs}")
+                print(f'Epoch {epoch + 1}/{num_epochs}')
                 print('='*70)
                 
                 # Train for one epoch
@@ -317,23 +317,23 @@ class LocalTrainer:
                     self.save_checkpoint(epoch + 1)
             
             # Final checkpoint and samples
-            print("\nTraining complete!")
+            print('\nTraining complete!')
             self.save_checkpoint(num_epochs)
             self.generate_samples(num_epochs)
             
         except KeyboardInterrupt:
-            print("\n\nTraining interrupted by user.")
-            print("Saving checkpoint...")
+            print('\n\nTraining interrupted by user.')
+            print('Saving checkpoint...')
             self.save_checkpoint(epoch + 1)
             self.generate_samples(epoch + 1)
         
-        print("\n" + "="*70)
-        print("Training Complete!")
-        print("="*70)
-        print(f"Final G loss: {self.g_losses[-1]:.4f}")
-        print(f"Final D loss: {self.d_losses[-1]:.4f}")
-        print(f"Samples saved to: {self.samples_dir}")
-        print(f"Checkpoints saved to: {self.checkpoints_dir}")
+        print('\n' + '='*70)
+        print('Training Complete!')
+        print('='*70)
+        print(f'Final G loss: {self.g_losses[-1]:.4f}')
+        print(f'Final D loss: {self.d_losses[-1]:.4f}')
+        print(f'Samples saved to: {self.samples_dir}')
+        print(f'Checkpoints saved to: {self.checkpoints_dir}')
 
 
 def main():

@@ -37,24 +37,24 @@ def download_celeba(output_dir='./data'):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    print("="*70)
-    print("CelebA Dataset Download")
-    print("="*70)
-    print("\nNOTE: Due to Google Drive download restrictions, you may need to")
-    print("download CelebA manually. Here are the recommended sources:")
-    print("\n1. Kaggle: https://www.kaggle.com/datasets/jessicali9530/celeba-dataset")
-    print("2. Official: https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html")
-    print("\nAfter downloading, extract the images to: ./data/celeba/")
-    print("\nAlternatively, you can use torchvision to download automatically:")
-    print("See the code below (requires torchvision).\n")
+    print('='*70)
+    print('CelebA Dataset Download')
+    print('='*70)
+    print('\nNOTE: Due to Google Drive download restrictions, you may need to')
+    print('download CelebA manually. Here are the recommended sources:')
+    print('\n1. Kaggle: https://www.kaggle.com/datasets/jessicali9530/celeba-dataset')
+    print('2. Official: https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html')
+    print('\nAfter downloading, extract the images to: ./data/celeba/')
+    print('\nAlternatively, you can use torchvision to download automatically:')
+    print('See the code below (requires torchvision).\n')
     
     # Try using torchvision
     try:
         from torchvision.datasets import CelebA
         import torchvision.transforms as transforms
         
-        print("Attempting to download using torchvision...")
-        print("This may take a while (the dataset is ~1.4 GB)")
+        print('Attempting to download using torchvision...')
+        print('This may take a while (the dataset is ~1.4 GB)')
         
         celeba_dir = output_dir / 'celeba_torchvision'
         
@@ -65,21 +65,21 @@ def download_celeba(output_dir='./data'):
             download=True
         )
         
-        print(f"\nDataset downloaded successfully!")
+        print(f'\nDataset downloaded successfully!')
         print(f"Location: {celeba_dir / 'celeba'}")
-        print(f"Number of images: {len(dataset)}")
-        print("\nYou can now use this dataset path in your config.yaml:")
+        print(f'Number of images: {len(dataset)}')
+        print('\nYou can now use this dataset path in your config.yaml:')
         print(f"  dataset_path: {celeba_dir / 'celeba' / 'img_align_celeba'}")
         
         return True
         
     except ImportError:
-        print("\ntorchvision not available for automatic download.")
-        print("Please download manually as described above.")
+        print('\ntorchvision not available for automatic download.')
+        print('Please download manually as described above.')
         return False
     except Exception as e:
-        print(f"\nError during download: {e}")
-        print("Please download manually as described above.")
+        print(f'\nError during download: {e}')
+        print('Please download manually as described above.')
         return False
 
 
@@ -92,7 +92,7 @@ def verify_dataset(dataset_path):
     dataset_path = Path(dataset_path)
     
     if not dataset_path.exists():
-        print(f"Error: Dataset path does not exist: {dataset_path}")
+        print(f'Error: Dataset path does not exist: {dataset_path}')
         return False
     
     # Count image files
@@ -100,19 +100,19 @@ def verify_dataset(dataset_path):
     num_images = len(image_files)
     
     if num_images == 0:
-        print(f"Error: No images found in {dataset_path}")
+        print(f'Error: No images found in {dataset_path}')
         return False
     
-    print(f"\nDataset verification:")
-    print(f"  Path: {dataset_path}")
-    print(f"  Number of images: {num_images}")
+    print(f'\nDataset verification:')
+    print(f'  Path: {dataset_path}')
+    print(f'  Number of images: {num_images}')
     
     if num_images < 100:
-        print(f"  Warning: Very small dataset ({num_images} images)")
-        print(f"  CelebA should have ~200,000 images")
+        print(f'  Warning: Very small dataset ({num_images} images)')
+        print(f'  CelebA should have ~200,000 images')
         return False
     
-    print(f"  ✓ Dataset looks good!")
+    print(f'  ✓ Dataset looks good!')
     return True
 
 

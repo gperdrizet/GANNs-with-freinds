@@ -30,7 +30,7 @@ class MainCoordinator:
         Args:
             config_path: Path to configuration file
         """
-        print("Initializing main coordinator...")
+        print('Initializing main coordinator...')
         
         # Load configuration
         self.config = load_config(config_path)
@@ -43,16 +43,16 @@ class MainCoordinator:
         self.device = get_device()
         
         # Load dataset to get size
-        print("Loading dataset...")
+        print('Loading dataset...')
         dataset = CelebADataset(
             root_dir=self.config['data']['dataset_path'],
             image_size=self.config['training']['image_size']
         )
         self.dataset_size = len(dataset)
-        print(f"Dataset size: {self.dataset_size}")
+        print(f'Dataset size: {self.dataset_size}')
         
         # Initialize models
-        print("Initializing models...")
+        print('Initializing models...')
         self.generator = Generator(
             latent_dim=self.config['training']['latent_dim']
         ).to(self.device)
@@ -86,11 +86,11 @@ class MainCoordinator:
         self.samples_dir.mkdir(parents=True, exist_ok=True)
         self.checkpoints_dir.mkdir(parents=True, exist_ok=True)
         
-        print("Main coordinator initialized successfully!")
+        print('Main coordinator initialized successfully!')
     
     def initialize_training(self):
         """Initialize training state in database."""
-        print("\nInitializing training state...")
+        print('\nInitializing training state...')
         
         # Save initial model weights
         self.db.save_model_weights('generator', 0, self.generator.state_dict())
@@ -109,7 +109,7 @@ class MainCoordinator:
             training_active=True
         )
         
-        print("Training state initialized!")
+        print('Training state initialized!')
     
     def create_work_units_for_iteration(self, iteration: int):
         """Create work units for current iteration.
@@ -132,7 +132,7 @@ class MainCoordinator:
             timeout_seconds=self.config['worker']['work_unit_timeout']
         )
         
-        print(f"Created {len(work_unit_ids)} work units for iteration {iteration}")
+        print(f'Created {len(work_unit_ids)} work units for iteration {iteration}')
         return len(work_unit_ids)
     
     def wait_for_gradients(self, iteration: int, total_work_units: int):
@@ -145,7 +145,7 @@ class MainCoordinator:
         Returns:
             True if enough gradients collected, False if should stop
         """
-        print(f"\nWaiting for workers to compute gradients...")
+        print(f'\nWaiting for workers to compute gradients...')
         
         last_update = time.time()
         update_interval = 10  # Print status every 10 seconds
@@ -160,19 +160,19 @@ class MainCoordinator:
             current_time = time.time()
             if current_time - last_update > update_interval:
                 active_workers = self.db.get_active_workers()
-                print(f"Progress: {completed}/{total} work units completed | "
-                      f"Active workers: {len(active_workers)}")
+                print(f'Progress: {completed}/{total} work units completed | '
+                      f'Active workers: {len(active_workers)}')
                 last_update = current_time
             
             # Check if all work units are completed
             if completed >= total:
-                print(f"All work units completed for iteration {iteration}")
+                print(f'All work units completed for iteration {iteration}')
                 return True
             
             # Check if we have minimum number of gradients
             gen_gradients = self.db.get_gradients_for_iteration('generator', iteration)
             if len(gen_gradients) >= self.min_workers_per_update:
-                print(f"Minimum threshold reached: {len(gen_gradients)} gradients collected")
+                print(f'Minimum threshold reached: {len(gen_gradients)} gradients collected')
                 return True
             
             # Sleep before checking again
@@ -184,17 +184,17 @@ class MainCoordinator:
         Args:
             iteration: Current training iteration
         """
-        print("\nAggregating gradients...")
+        print('\nAggregating gradients...')
         
         # Get gradients from database
         gen_gradients_info = self.db.get_gradients_for_iteration('generator', iteration)
         disc_gradients_info = self.db.get_gradients_for_iteration('discriminator', iteration)
         
         num_workers = len(gen_gradients_info)
-        print(f"Received gradients from {num_workers} workers")
+        print(f'Received gradients from {num_workers} workers')
         
         if num_workers == 0:
-            print("No gradients to aggregate!")
+            print('No gradients to aggregate!')
             return
         
         # Average gradients (weighted by number of samples)
@@ -206,7 +206,7 @@ class MainCoordinator:
         apply_gradients(self.discriminator, avg_disc_gradients)
         
         # Optimizer step
-        print("Applying optimizer step...")
+        print('Applying optimizer step...')
         self.optimizer_g.step()
         self.optimizer_d.step()
         
@@ -224,7 +224,7 @@ class MainCoordinator:
         # Clean up gradients from database
         self.db.delete_gradients_for_iteration(iteration)
         
-        print("Models updated successfully!")
+        print('Models updated successfully!')
     
     def generate_samples(self, iteration: int):
         """Generate and save sample images.
@@ -239,7 +239,7 @@ class MainCoordinator:
         
         output_path = self.samples_dir / f'iteration_{iteration:06d}.png'
         save_generated_images(fake_images, str(output_path))
-        print(f"Saved sample images to {output_path}")
+        print(f'Saved sample images to {output_path}')
     
     def run(self, num_epochs: int = 50, sample_interval: int = 100):
         """Run main training loop.
@@ -248,9 +248,9 @@ class MainCoordinator:
             num_epochs: Number of epochs to train
             sample_interval: Generate samples every N iterations
         """
-        print("\n" + "="*70)
-        print("Starting Distributed GAN Training")
-        print("="*70)
+        print('\n' + '='*70)
+        print('Starting Distributed GAN Training')
+        print('='*70)
         
         # Initialize training
         self.initialize_training()
@@ -259,21 +259,21 @@ class MainCoordinator:
         images_per_work_unit = self.batch_size * self.batches_per_work_unit
         work_units_per_epoch = self.dataset_size // images_per_work_unit
         
-        print(f"\nTraining configuration:")
-        print(f"  Epochs: {num_epochs}")
-        print(f"  Dataset size: {self.dataset_size}")
-        print(f"  Batch size: {self.batch_size}")
-        print(f"  Batches per work unit: {self.batches_per_work_unit}")
-        print(f"  Images per work unit: {images_per_work_unit}")
-        print(f"  Work units per epoch: {work_units_per_epoch}")
-        print(f"  Min workers per update: {self.min_workers_per_update}")
+        print(f'\nTraining configuration:')
+        print(f'  Epochs: {num_epochs}')
+        print(f'  Dataset size: {self.dataset_size}')
+        print(f'  Batch size: {self.batch_size}')
+        print(f'  Batches per work unit: {self.batches_per_work_unit}')
+        print(f'  Images per work unit: {images_per_work_unit}')
+        print(f'  Work units per epoch: {work_units_per_epoch}')
+        print(f'  Min workers per update: {self.min_workers_per_update}')
         
         iteration = 0
         
         try:
             for epoch in range(num_epochs):
                 print(f"\n{'='*70}")
-                print(f"Epoch {epoch + 1}/{num_epochs}")
+                print(f'Epoch {epoch + 1}/{num_epochs}')
                 print('='*70)
                 
                 # Create work units for this iteration
@@ -281,7 +281,7 @@ class MainCoordinator:
                 
                 # Wait for workers to complete work units
                 if not self.wait_for_gradients(iteration, total_work_units):
-                    print("Training stopped.")
+                    print('Training stopped.')
                     break
                 
                 # Aggregate gradients and update models
@@ -295,12 +295,12 @@ class MainCoordinator:
                 
                 # Generate sample images periodically
                 if iteration % sample_interval == 0:
-                    print("\nGenerating sample images...")
+                    print('\nGenerating sample images...')
                     self.generate_samples(iteration)
                 
                 # Print active workers
                 active_workers = self.db.get_active_workers()
-                print(f"\nActive workers: {len(active_workers)}")
+                print(f'\nActive workers: {len(active_workers)}')
                 for worker in active_workers[:5]:  # Show first 5
                     print(f"  - {worker['worker_id']}: {worker['total_work_units']} work units, "
                           f"{worker['total_images']} images")
@@ -308,29 +308,29 @@ class MainCoordinator:
                 iteration += 1
         
         except KeyboardInterrupt:
-            print("\n\nTraining interrupted by user.")
+            print('\n\nTraining interrupted by user.')
         except Exception as e:
-            print(f"\n\nError in training: {e}")
+            print(f'\n\nError in training: {e}')
             import traceback
             traceback.print_exc()
         finally:
             # Mark training as inactive
             self.db.update_training_state(training_active=False)
-            print("\n\nTraining stopped. Workers will stop automatically.")
+            print('\n\nTraining stopped. Workers will stop automatically.')
             
             # Generate final samples
-            print("Generating final samples...")
+            print('Generating final samples...')
             self.generate_samples(iteration)
             
             # Print final statistics
-            print("\n" + "="*70)
-            print("Training Complete!")
-            print("="*70)
-            print(f"Total iterations: {iteration}")
+            print('\n' + '='*70)
+            print('Training Complete!')
+            print('='*70)
+            print(f'Total iterations: {iteration}')
             active_workers = self.db.get_active_workers(timeout_seconds=3600)
-            print(f"Total workers participated: {len(active_workers)}")
+            print(f'Total workers participated: {len(active_workers)}')
             total_images = sum(w['total_images'] for w in active_workers)
-            print(f"Total images processed: {total_images}")
+            print(f'Total images processed: {total_images}')
 
 
 def main():

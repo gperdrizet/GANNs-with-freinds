@@ -25,7 +25,7 @@ class ModelWeights(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     def __repr__(self):
-        return f"<ModelWeights(type={self.model_type}, iter={self.iteration})>"
+        return f'<ModelWeights(type={self.model_type}, iter={self.iteration})>'
 
 
 class OptimizerState(Base):
@@ -39,7 +39,7 @@ class OptimizerState(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     def __repr__(self):
-        return f"<OptimizerState(type={self.model_type}, iter={self.iteration})>"
+        return f'<OptimizerState(type={self.model_type}, iter={self.iteration})>'
 
 
 class Gradients(Base):
@@ -56,7 +56,7 @@ class Gradients(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     def __repr__(self):
-        return f"<Gradients(worker={self.worker_id}, type={self.model_type}, iter={self.iteration})>"
+        return f'<Gradients(worker={self.worker_id}, type={self.model_type}, iter={self.iteration})>'
 
 
 class WorkUnit(Base):
@@ -75,7 +75,7 @@ class WorkUnit(Base):
     num_batches = Column(Integer, nullable=False)  # Number of batches in this work unit
     
     def __repr__(self):
-        return f"<WorkUnit(id={self.id}, status={self.status}, worker={self.worker_id})>"
+        return f'<WorkUnit(id={self.id}, status={self.status}, worker={self.worker_id})>'
 
 
 class TrainingState(Base):
@@ -95,7 +95,7 @@ class TrainingState(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
     def __repr__(self):
-        return f"<TrainingState(iter={self.current_iteration}, epoch={self.current_epoch})>"
+        return f'<TrainingState(iter={self.current_iteration}, epoch={self.current_epoch})>'
 
 
 class Worker(Base):
@@ -114,4 +114,4 @@ class Worker(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     def __repr__(self):
-        return f"<Worker(id={self.worker_id}, status={self.status})>"
+        return f'<Worker(id={self.worker_id}, status={self.status})>'

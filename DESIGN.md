@@ -5,9 +5,9 @@ A distributed GAN training system using students as a compute cluster, with a Po
 
 ## Architecture
 
-### System Components
+### System components
 
-#### 1. **Main Process (Coordinator)**
+#### 1. **Main process (coordinator)**
 - Runs on instructor's machine
 - Manages training loop orchestration
 - Aggregates gradients from workers
@@ -15,19 +15,19 @@ A distributed GAN training system using students as a compute cluster, with a Po
 - Tracks training progress
 - Updates model weights in database
 
-#### 2. **Worker Processes** 
+#### 2. **Worker processes** 
 - Runs on student machines (forked repos in devcontainers)
 - Fetches work units and current model weights from database
 - Performs forward and backward passes on assigned batches
 - Uploads gradients back to database
 - Polls continuously for new work
 
-#### 3. **PostgreSQL Database**
+#### 3. **PostgreSQL database**
 - Central communication hub
 - Stores model weights, gradients, work units, and metadata
 - No direct networking between main/workers needed
 
-### Training Flow
+### Training flow
 
 ```
 Main Process:
@@ -57,7 +57,7 @@ Worker Process:
 10. Repeat from step 2
 ```
 
-### Database Schema
+### Database schema
 
 #### Tables
 
@@ -110,7 +110,7 @@ Worker Process:
 - `last_heartbeat`: Timestamp
 - `created_at`: Timestamp
 
-### Model Architecture
+### Model architecture
 
 **DCGAN (Deep Convolutional GAN)**
 - Target image size: 64x64x3 (CelebA cropped and resized)
@@ -140,7 +140,7 @@ Output: Single logit (real/fake)
 Activations: BatchNorm + LeakyReLU (except output: none)
 ```
 
-### Training Parameters
+### Training parameters
 
 - **Batch size per worker**: 32
 - **Batches per work unit**: 10 (320 images per work unit)
@@ -151,7 +151,7 @@ Activations: BatchNorm + LeakyReLU (except output: none)
 - **Worker heartbeat interval**: 30 seconds
 - **Gradient aggregation**: Average across all workers
 
-### Data Management
+### Data management
 
 **CelebA Dataset:**
 - ~200,000 celebrity face images
@@ -192,7 +192,7 @@ data:
   num_workers_dataloader: 4
 ```
 
-### Implementation Files
+### Implementation files
 
 ```
 src/
@@ -215,7 +215,7 @@ config/
 └── config.yaml.template      # Configuration template
 ```
 
-### Fault Tolerance
+### Fault tolerance
 
 **Work Unit Timeout:**
 - If worker doesn't complete work unit within timeout, mark as 'failed'
@@ -233,7 +233,7 @@ config/
 - Claim available/failed work units
 - Immediately participate in training
 
-### Monitoring Dashboard (Future Enhancement)
+### Monitoring dashboard (future enhancement)
 
 Students can view:
 - Their contribution metrics (batches processed, uptime)
@@ -242,7 +242,7 @@ Students can view:
 - Sample generated images
 - Real-time training curves
 
-## Benefits for Educational Use
+## Benefits for educational use
 
 1. **Distributed Systems Concepts**: Students learn about coordination, fault tolerance, race conditions
 2. **Database as Message Queue**: Novel use of SQL for distributed computing
@@ -251,7 +251,7 @@ Students can view:
 5. **Collaborative**: Entire class works together towards common goal
 6. **Scalable**: Easy to add/remove workers without complex networking
 
-## Performance Estimates
+## Performance estimates
 
 **With 10 workers (avg GPU: RTX 3060):**
 - ~15-20 batches/sec total throughput
@@ -260,7 +260,7 @@ Students can view:
 - ~50 epochs for decent results
 - **Total training time: ~4-5 hours**
 
-## Future Enhancements
+## Future enhancements
 
 1. Web-based monitoring dashboard
 2. Gradient compression (reduce DB bandwidth)

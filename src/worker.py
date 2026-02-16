@@ -31,7 +31,7 @@ class Worker:
         Args:
             config_path: Path to configuration file
         """
-        print("Initializing worker...")
+        print('Initializing worker...')
         
         # Load configuration
         self.config = load_config(config_path)
@@ -49,14 +49,14 @@ class Worker:
         self.device = get_device()
         
         # Load dataset
-        print("Loading dataset...")
+        print('Loading dataset...')
         self.dataset = CelebADataset(
             root_dir=self.config['data']['dataset_path'],
             image_size=self.config['training']['image_size']
         )
         
         # Initialize models
-        print("Initializing models...")
+        print('Initializing models...')
         self.generator = Generator(
             latent_dim=self.config['training']['latent_dim']
         ).to(self.device)
@@ -67,7 +67,7 @@ class Worker:
         self.criterion = nn.BCEWithLogitsLoss()
         
         # Register worker in database
-        print(f"Registering worker: {self.worker_id}")
+        print(f'Registering worker: {self.worker_id}')
         self.db.register_worker(self.worker_id, self.hostname, self.gpu_name)
         
         # Training config
@@ -79,9 +79,9 @@ class Worker:
         # Timing
         self.last_heartbeat = time.time()
         
-        print(f"Worker {self.worker_id} initialized successfully!")
-        print(f"GPU: {self.gpu_name}")
-        print(f"Dataset size: {len(self.dataset)}")
+        print(f'Worker {self.worker_id} initialized successfully!')
+        print(f'GPU: {self.gpu_name}')
+        print(f'Dataset size: {len(self.dataset)}')
     
     def update_heartbeat(self):
         """Update worker heartbeat in database."""
@@ -116,8 +116,8 @@ class Worker:
         iteration = work_unit['iteration']
         image_indices = work_unit['image_indices']
         
-        print(f"\nProcessing work unit {work_unit_id} (iteration {iteration})")
-        print(f"Number of images: {len(image_indices)}")
+        print(f'\nProcessing work unit {work_unit_id} (iteration {iteration})')
+        print(f'Number of images: {len(image_indices)}')
         
         # Load current model weights
         self.load_model_weights(iteration)
@@ -193,17 +193,17 @@ class Worker:
         d_real_acc = total_d_real_correct / total_samples
         d_fake_acc = total_d_fake_correct / total_samples
         
-        print(f"Completed {num_batches} batches ({total_samples} images)")
-        print(f"G_loss: {avg_g_loss:.4f} | D_loss: {avg_d_loss:.4f} | "
-              f"D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}")
+        print(f'Completed {num_batches} batches ({total_samples} images)')
+        print(f'G_loss: {avg_g_loss:.4f} | D_loss: {avg_d_loss:.4f} | '
+              f'D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}')
         
         # Extract gradients
-        print("Extracting gradients...")
+        print('Extracting gradients...')
         gen_gradients = compute_gradient_dict(self.generator)
         disc_gradients = compute_gradient_dict(self.discriminator)
         
         # Upload gradients to database
-        print("Uploading gradients...")
+        print('Uploading gradients...')
         self.db.save_gradients(
             worker_id=self.worker_id,
             model_type='generator',
@@ -233,12 +233,12 @@ class Worker:
             images=total_samples
         )
         
-        print(f"Work unit {work_unit_id} completed successfully!")
+        print(f'Work unit {work_unit_id} completed successfully!')
     
     def run(self):
         """Main worker loop."""
-        print(f"\nWorker {self.worker_id} starting main loop...")
-        print("Waiting for work units...")
+        print(f'\nWorker {self.worker_id} starting main loop...')
+        print('Waiting for work units...')
         
         try:
             while True:
@@ -248,7 +248,7 @@ class Worker:
                 # Check if training is still active
                 training_state = self.db.get_training_state()
                 if training_state and not training_state['training_active']:
-                    print("\nTraining has been stopped by coordinator.")
+                    print('\nTraining has been stopped by coordinator.')
                     break
                 
                 # Try to claim a work unit
@@ -265,13 +265,13 @@ class Worker:
                     time.sleep(self.poll_interval)
         
         except KeyboardInterrupt:
-            print("\n\nWorker interrupted by user.")
+            print('\n\nWorker interrupted by user.')
         except Exception as e:
-            print(f"\n\nError in worker: {e}")
+            print(f'\n\nError in worker: {e}')
             import traceback
             traceback.print_exc()
         finally:
-            print(f"\nWorker {self.worker_id} shutting down...")
+            print(f'\nWorker {self.worker_id} shutting down...')
 
 
 def main():

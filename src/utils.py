@@ -50,10 +50,10 @@ def get_device() -> torch.device:
     """
     if torch.cuda.is_available():
         device = torch.device('cuda')
-        print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+        print(f'Using GPU: {torch.cuda.get_device_name(0)}')
     else:
         device = torch.device('cpu')
-        print("Using CPU")
+        print('Using CPU')
     
     return device
 
@@ -84,7 +84,7 @@ def generate_worker_id() -> str:
     Returns:
         Unique worker identifier
     """
-    return f"{get_hostname()}_{uuid.uuid4().hex[:8]}"
+    return f'{get_hostname()}_{uuid.uuid4().hex[:8]}'
 
 
 def save_generated_images(
@@ -127,11 +127,11 @@ def format_time(seconds: float) -> str:
     secs = int(seconds % 60)
     
     if hours > 0:
-        return f"{hours}h {minutes}m {secs}s"
+        return f'{hours}h {minutes}m {secs}s'
     elif minutes > 0:
-        return f"{minutes}m {secs}s"
+        return f'{minutes}m {secs}s'
     else:
-        return f"{secs}s"
+        return f'{secs}s'
 
 
 def compute_gradient_dict(model: torch.nn.Module) -> Dict[str, torch.Tensor]:
@@ -246,12 +246,12 @@ def print_training_stats(
         d_fake_acc: Discriminator accuracy on fake images
         num_workers: Number of active workers
     """
-    stats = f"[Epoch {epoch}] [Iter {iteration}] "
-    stats += f"G_loss: {g_loss:.4f} | D_loss: {d_loss:.4f} | "
-    stats += f"D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}"
+    stats = f'[Epoch {epoch}] [Iter {iteration}] '
+    stats += f'G_loss: {g_loss:.4f} | D_loss: {d_loss:.4f} | '
+    stats += f'D_real: {d_real_acc:.2%} | D_fake: {d_fake_acc:.2%}'
     
     if num_workers is not None:
-        stats += f" | Workers: {num_workers}"
+        stats += f' | Workers: {num_workers}'
     
     print(stats)
 
@@ -261,16 +261,16 @@ if __name__ == '__main__':
     print("Testing utilities...")
     
     device = get_device()
-    print(f"Device: {device}")
+    print(f'Device: {device}')
     
     gpu_name = get_gpu_name()
-    print(f"GPU: {gpu_name}")
+    print(f'GPU: {gpu_name}')
     
     hostname = get_hostname()
-    print(f"Hostname: {hostname}")
+    print(f'Hostname: {hostname}')
     
     worker_id = generate_worker_id()
-    print(f"Worker ID: {worker_id}")
+    print(f'Worker ID: {worker_id}')
     
     print(format_time(3661))
     print(format_time(125))

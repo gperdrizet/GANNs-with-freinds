@@ -2,7 +2,7 @@
 
 An educational distributed deep learning system where students become part of a compute cluster to train a GAN (Generative Adversarial Network) to generate celebrity faces.
 
-## 🎯 Concept
+## Concept
 
 This project demonstrates distributed machine learning by:
 - Using students' GPUs as a distributed compute cluster
@@ -10,32 +10,32 @@ This project demonstrates distributed machine learning by:
 - Training a DCGAN to generate realistic face images
 - Teaching distributed systems, parallel training, and GANs simultaneously
 
-## 🏗️ Architecture
+## Architecture
 
-**Main Process (Instructor):**
+**Main process (instructor):**
 - Creates work units (batches of image indices)
 - Aggregates gradients from workers
 - Applies optimizer steps
 - Tracks training progress
 
-**Worker Process (Students):**
+**Worker process (students):**
 - Polls database for available work
 - Computes gradients on assigned image batches
 - Uploads gradients back to database
 - Runs continuously until training completes
 
-**PostgreSQL Database:**
+**PostgreSQL database:**
 - Stores model weights, gradients, work units
 - Acts as communication hub (no port forwarding needed!)
 - Tracks worker statistics for monitoring
 
-## 📁 Project Structure
+## Project structure
 
 ```
 GANNs-with-freinds/
 ├── src/
 │   ├── models/
-│   │   └── dcgan.py              # Generator & Discriminator models
+│   │   └── dcgan.py              # Generator and discriminator models
 │   ├── data/
 │   │   └── dataset.py            # CelebA dataset loader
 │   ├── database/
@@ -61,9 +61,9 @@ GANNs-with-freinds/
 └── README.md
 ```
 
-## 🚀 Quick Start
+## Quick start
 
-### For Students (Workers)
+### For students (workers)
 
 1. **Fork and clone this repository**
    ```bash
@@ -71,7 +71,7 @@ GANNs-with-freinds/
    cd GANNs-with-freinds
    ```
 
-2. **Open in Dev Container**
+2. **Open in dev container**
    - Open VS Code
    - Click "Reopen in Container" when prompted
    - Wait for container to build
@@ -99,9 +99,9 @@ GANNs-with-freinds/
    python worker.py
    ```
 
-   Your GPU is now part of the training cluster! 🎉
+   Your GPU is now part of the training cluster!
 
-### Alternative: Local Training (Single GPU)
+### Alternative: Local training (single GPU)
 
 Want to train the same model locally without the distributed setup? Great for experimentation and comparison!
 
@@ -136,7 +136,7 @@ Want to train the same model locally without the distributed setup? Great for ex
    - Generated face samples
    - Training progression over time
 
-### For Instructor (Main Coordinator)
+### For instructor (main coordinator)
 
 1. **Setup PostgreSQL database**
    - Deploy public facing SQL database
@@ -172,7 +172,7 @@ Want to train the same model locally without the distributed setup? Great for ex
    ```
    The demo notebook visualizes training results and generates new faces.
 
-## 📋 Requirements
+## Requirements
 
 ### Hardware
 - **NVIDIA GPU** (any consumer GPU works, even older models)
@@ -184,7 +184,7 @@ Want to train the same model locally without the distributed setup? Great for ex
 - **VS Code** with Dev Containers extension
 - **NVIDIA drivers** (version ≥545)
 
-## ⚙️ Configuration
+## Configuration
 
 Edit `config/config.yaml`:
 
@@ -210,31 +210,31 @@ data:
   dataset_path: ./data/celeba
 ```
 
-## 🎓 What Students Learn
+## What students learn
 
-### Distributed Systems
+### Distributed systems
 - Coordination without direct networking
 - Fault tolerance and worker dropout
 - Atomic operations and race conditions
 - Work unit timeouts and reassignment
 
-### Deep Learning
-- GAN architecture (Generator & Discriminator)
+### Deep learning
+- GAN architecture (generator and discriminator)
 - Data parallel training
 - Gradient aggregation
 - Optimizer state management
 
-### Database as Message Queue
+### Database as message queue
 - Novel use of PostgreSQL for distributed computing
 - BLOB storage for model weights/gradients
 - Atomic work unit claiming with `FOR UPDATE SKIP LOCKED`
 
-## 📊 Monitoring
+## Monitoring
 
-### For Students
+### For students
 Check your contribution stats in the database or wait for the instructor's dashboard.
 
-### For Instructor
+### For instructor
 Monitor training progress via SQL queries:
 
 ```sql
@@ -253,7 +253,7 @@ WHERE iteration = (SELECT current_iteration FROM training_state)
 GROUP BY status;
 ```
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 **Worker can't connect to database:**
 - Verify config.yaml has correct credentials
@@ -275,7 +275,7 @@ GROUP BY status;
 - Verify `num_workers_per_update` setting
 - Look for errors in main coordinator logs
 
-## 🧪 Testing
+## Testing
 
 Test individual components:
 
@@ -301,78 +301,78 @@ cd src
 python train_local.py --epochs 1
 ```
 
-## 🔄 Distributed vs Local Training
+## Distributed vs local training
 
-### When to Use Distributed (Main + Workers)
-✅ **Educational focus** - Learn distributed systems concepts  
-✅ **Collaborative project** - Entire class working together  
-✅ **Demonstrate real-world** - How large-scale training works  
-✅ **Limited individual resources** - Pool multiple GPUs  
-
-**Trade-offs:**
-- ⚠️ Network overhead (database I/O)
-- ⚠️ Coordination complexity
-- ⚠️ Requires database setup
-
-### When to Use Local Training
-✅ **Quick experimentation** - Test hyperparameters  
-✅ **Solo learning** - Practice GANs independently  
-✅ **Baseline comparison** - Compare distributed efficiency  
-✅ **Faster iteration** - No network/coordination overhead  
+### When to use distributed (main + workers)
+- **Educational focus** - Learn distributed systems concepts  
+- **Collaborative project** - Entire class working together  
+- **Demonstrate real-world** - How large-scale training works  
+- **Limited individual resources** - Pool multiple GPUs  
 
 **Trade-offs:**
-- ⚠️ Limited to single GPU
-- ⚠️ Misses distributed systems lessons
+- Network overhead (database I/O)
+- Coordination complexity
+- Requires database setup
 
-### Performance Comparison
+### When to use local training
+- **Quick experimentation** - Test hyperparameters  
+- **Solo learning** - Practice GANs independently  
+- **Baseline comparison** - Compare distributed efficiency  
+- **Faster iteration** - No network/coordination overhead  
+
+**Trade-offs:**
+- Limited to single GPU
+- Misses distributed systems lessons
+
+### Performance comparison
 ```
 Distributed (10 workers, batch=32 each):
 - Effective batch size: ~320 (varies by workers available)
 - Time per iteration: ~15-30s (includes DB overhead)
 - Total training: ~4-5 hours
-- Educational value: ⭐⭐⭐⭐⭐
+- Educational value: High (5/5)
 
 Local (1 GPU, batch=128):
 - Effective batch size: 128
 - Time per iteration: ~2-5s (no overhead)
 - Total training: ~3-4 hours
-- Educational value: ⭐⭐⭐ (GANs only)
+- Educational value: Moderate (3/5 - GANs only)
 ```
 
 **Both produce similar quality results!** The distributed approach teaches more concepts.
 
-## 📈 Expected Results
+## Expected results
 
-**Training Time:** 4-5 hours with 10 workers (mixed consumer GPUs)
+**Training time:** 4-5 hours with 10 workers (mixed consumer GPUs)
 
-**Sample Progression:**
+**Sample progression:**
 - Iteration 0-100: Random noise
 - Iteration 100-500: Blob-like shapes and colors
 - Iteration 500-1000: Face-like structures emerge
 - Iteration 1000-3000: Recognizable faces with details
 - Iteration 3000+: High-quality celebrity faces
 
-## 🎯 Performance Tips
+## Performance tips
 
-### For Students
+### For students
 - Close unnecessary applications
 - Use dedicated GPU if you have multiple
 - Reduce batch size if running low on VRAM
 - Keep worker running continuously for best results
 
-### For Instructor  
+### For instructor  
 - Start with more workers than `num_workers_per_update`
 - Monitor for stale workers and timed-out work units
 - Generate samples frequently to track progress
 - Save checkpoints periodically
 
-## 📚 Further Reading
+## Further reading
 
 - [DCGAN Paper](https://arxiv.org/abs/1511.06434) - Original architecture
 - [Data Parallel Training](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html) - PyTorch guide
 - [CelebA Dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) - Dataset details
 
-## 🤝 Contributing
+## Contributing
 
 This is an educational project! Contributions welcome:
 - Bug fixes and improvements
@@ -381,11 +381,11 @@ This is an educational project! Contributions welcome:
 - Gradient compression techniques
 - Support for other datasets
 
-## 📝 License
+## License
 
 MIT License - See LICENSE file for details
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - CelebA dataset from MMLAB CUHK
 - DCGAN architecture from Radford et al.

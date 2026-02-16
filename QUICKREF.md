@@ -1,8 +1,8 @@
 # Quick Reference Guide
 
-## For Students (Workers)
+## For students (workers)
 
-### Initial Setup
+### Initial setup
 ```bash
 # 1. Clone the repository
 git clone https://github.com/YOUR_USERNAME/GANNs-with-freinds.git
@@ -19,13 +19,13 @@ cp config/config.yaml.template config/config.yaml
 python scripts/download_celeba.py
 ```
 
-### Starting Your Worker
+### Starting your worker
 ```bash
 cd src
 python worker.py
 ```
 
-### Stopping Your Worker
+### Stopping your worker
 Press `Ctrl+C` in the terminal
 
 ### Troubleshooting
@@ -45,15 +45,15 @@ python dataset.py ../../data/celeba
 # Look for "Processing work unit..." messages
 ```
 
-## Local Training (Single GPU)
+## Local training (single GPU)
 
-### Quick Start
+### Quick start
 ```bash
 cd src
 python train_local.py --epochs 50 --batch-size 128
 ```
 
-### Common Commands
+### Common commands
 ```bash
 # Train with custom settings
 python train_local.py --epochs 100 --batch-size 64 --lr 0.0001
@@ -77,14 +77,14 @@ ls -ltr outputs_local/samples/
 ls -ltr outputs_local/checkpoints/
 ```
 
-### Quick Test
+### Quick test
 ```bash
 # Test local training (1 epoch)
 cd src
 python train_local.py --epochs 1 --batch-size 64
 ```
 
-### Performance Comparison
+### Performance comparison
 ```bash
 # Distributed: Multiple GPUs working together
 # - Slower per-iteration (network overhead)
@@ -96,9 +96,9 @@ python train_local.py --epochs 1 --batch-size 64
 # - Good for experimentation
 ```
 
-## Viewing Results
+## Viewing results
 
-### Demo Notebook
+### Demo notebook
 ```bash
 # After training, visualize results with the demo notebook
 jupyter notebook notebooks/demo_trained_model.ipynb
@@ -113,7 +113,7 @@ jupyter lab notebooks/demo_trained_model.ipynb
 - Training progression over epochs
 - Interactive face generation
 
-### Quick View
+### Quick view
 ```bash
 # Just look at sample images
 ls -ltr outputs_local/samples/  # Local training
@@ -123,9 +123,9 @@ ls -ltr outputs/samples/        # Distributed training
 xdg-open outputs_local/samples/epoch_*.png  # Linux
 ```
 
-## For Instructor (Main Coordinator)
+## For instructor (main coordinator)
 
-### First Time Setup
+### First time setup
 ```bash
 # 1. Setup PostgreSQL database (containerized)
 # Note connection details
@@ -141,7 +141,7 @@ python main.py --epochs 1 --sample-interval 1
 # Stop it after first iteration (Ctrl+C)
 ```
 
-### Starting Training
+### Starting training
 ```bash
 cd src
 python main.py --epochs 50 --sample-interval 1
@@ -159,18 +159,18 @@ ls -ltr outputs/samples/
 # Query database: SELECT * FROM training_state;
 ```
 
-### Stopping Training
+### Stopping training
 Press `Ctrl+C` in the terminal. Workers will automatically stop when they detect training is inactive.
 
-### Resetting Training
+### Resetting training
 ```bash
 cd src
 python database/init_db.py --reset
 ```
 
-## Database Queries
+## Database queries
 
-### Check Training Progress
+### Check training progress
 ```sql
 SELECT current_iteration, current_epoch, 
        g_loss, d_loss, 
@@ -179,7 +179,7 @@ SELECT current_iteration, current_epoch,
 FROM training_state;
 ```
 
-### List Active Workers
+### List active workers
 ```sql
 SELECT worker_id, hostname, gpu_name, 
        total_work_units, total_images,
@@ -189,7 +189,7 @@ WHERE last_heartbeat > NOW() - INTERVAL '2 minutes'
 ORDER BY total_images DESC;
 ```
 
-### Work Unit Status
+### Work unit status
 ```sql
 SELECT iteration, status, COUNT(*) as count
 FROM work_units
@@ -197,7 +197,7 @@ GROUP BY iteration, status
 ORDER BY iteration DESC, status;
 ```
 
-### Top Contributors
+### Top contributors
 ```sql
 SELECT worker_id, gpu_name, 
        total_work_units, 
@@ -208,7 +208,7 @@ ORDER BY total_images DESC
 LIMIT 10;
 ```
 
-## File Structure
+## File structure
 
 ```
 Important files:
@@ -221,7 +221,7 @@ Important files:
 └── outputs/samples/            # Generated images appear here
 ```
 
-## Common Issues
+## Common issues
 
 | Issue | Solution |
 |-------|----------|
@@ -233,21 +233,21 @@ Important files:
 | Local training OOM | Use smaller batch size: `--batch-size 32` |
 | Local training slow | Reduce num_workers: `--num-workers 2` |
 
-## Performance Tuning
+## Performance tuning
 
-### Distributed Training - If You Have Low VRAM (4-6GB)
+### Distributed training - if you have low VRAM (4-6GB)
 ```yaml
 training:
   batch_size: 16  # Reduce from 32
 ```
 
-### Distributed Training - If You Have High VRAM (12GB+)
+### Distributed training - if you have high VRAM (12GB+)
 ```yaml
 training:
   batch_size: 64  # Increase from 32
 ```
 
-### Local Training - Batch Size Guide
+### Local training - batch size guide
 ```bash
 # Low VRAM (4-6GB)
 python train_local.py --batch-size 32
@@ -262,20 +262,20 @@ python train_local.py --batch-size 128
 python train_local.py --batch-size 256
 ```
 
-### If Database is Slow
+### If database is slow
 ```yaml
 training:
   batches_per_work_unit: 20  # Increase from 10
   num_workers_per_update: 5  # Increase from 3
 ```
 
-## Expected Timeline
+## Expected timeline
 
 - **Setup:** 15-30 minutes (dataset download takes longest)
 - **Training:** 4-5 hours with 10 workers
 - **Results:** Recognizable faces after ~2 hours
 
-## Tips for Success
+## Tips for success
 
 ### Students
 - Keep your worker running for the entire session
@@ -290,18 +290,18 @@ training:
 - Save interesting sample generations
 - Take screenshots for demonstration
 
-## Emergency Procedures
+## Emergency procedures
 
-### Worker Crashed
+### Worker crashed
 Just restart it - it will automatically pick up where it left off
 
-### Main Process Crashed
+### Main process crashed
 Restart it - it will resume from last saved iteration
 
-### Database Connection Lost
+### Database connection lost
 Workers will retry automatically. Check database availability.
 
-### Need to Stop Everything
+### Need to stop everything
 1. Stop main process (Ctrl+C)
 2. Workers will stop automatically when they detect inactive training
 3. OR manually stop database to force all connections closed

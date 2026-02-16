@@ -28,20 +28,20 @@ def build_db_url(db_config: dict) -> str:
 
 def main():
     """Initialize database tables."""
-    print("Loading configuration...")
+    print('Loading configuration...')
     config = load_config()
     
-    print("Connecting to database...")
+    print('Connecting to database...')
     db_url = build_db_url(config['database'])
     db_manager = DatabaseManager(db_url)
     
-    print("Creating tables...")
+    print('Creating tables...')
     db_manager.init_database()
     
-    print("Initializing training state...")
+    print('Initializing training state...')
     db_manager.init_training_state()
     
-    print("Database initialized successfully!")
+    print('Database initialized successfully!')
 
 
 if __name__ == '__main__':
@@ -58,11 +58,11 @@ if __name__ == '__main__':
             config = load_config()
             db_url = build_db_url(config['database'])
             db_manager = DatabaseManager(db_url)
-            print("Resetting database...")
+            print('Resetting database...')
             db_manager.reset_database()
             db_manager.init_training_state()
-            print("Database reset complete!")
+            print('Database reset complete!')
         else:
-            print("Reset cancelled.")
+            print('Reset cancelled.')
     else:
         main()
