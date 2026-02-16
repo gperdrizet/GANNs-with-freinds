@@ -1,38 +1,19 @@
 """
-Script to download and preprocess CelebA dataset.
+Script to download CelebA dataset using torchvision.
 """
 
-import os
 import sys
-import zipfile
 from pathlib import Path
-import urllib.request
-from tqdm import tqdm
-
-
-class DownloadProgressBar(tqdm):
-    """Progress bar for downloads."""
-    
-    def update_to(self, b=1, bsize=1, tsize=None):
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-
-
-def download_url(url, output_path):
-    """Download file from URL with progress bar."""
-    with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, desc=output_path) as t:
-        urllib.request.urlretrieve(url, filename=output_path, reporthook=t.update_to)
 
 
 def download_celeba(output_dir='./data'):
-    """Download CelebA dataset from Google Drive.
+    """Download CelebA dataset using torchvision.
     
-    Note: This uses the aligned & cropped version of CelebA.
-    If this link doesn't work, you may need to download manually from:
-    https://www.kaggle.com/datasets/jessicali9530/celeba-dataset
-    or
-    https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
+    Args:
+        output_dir: Directory where dataset will be saved
+        
+    Returns:
+        True if successful, False otherwise
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -40,46 +21,43 @@ def download_celeba(output_dir='./data'):
     print('='*70)
     print('CelebA Dataset Download')
     print('='*70)
-    print('\nNOTE: Due to Google Drive download restrictions, you may need to')
-    print('download CelebA manually. Here are the recommended sources:')
-    print('\n1. Kaggle: https://www.kaggle.com/datasets/jessicali9530/celeba-dataset')
-    print('2. Official: https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html')
-    print('\nAfter downloading, extract the images to: ./data/celeba/')
-    print('\nAlternatively, you can use torchvision to download automatically:')
-    print('See the code below (requires torchvision).\n')
+    print('\nDownloading CelebA dataset using torchvision...')
+    print('This may take a while (the dataset is ~1.4 GB)\n')
     
-    # Try using torchvision
     try:
         from torchvision.datasets import CelebA
-        import torchvision.transforms as transforms
-        
-        print('Attempting to download using torchvision...')
-        print('This may take a while (the dataset is ~1.4 GB)')
         
         celeba_dir = output_dir / 'celeba_torchvision'
         
-        # Download dataset
+        # Download dataset (aligned and cropped version)
+        print('Downloading aligned and cropped images...')
         dataset = CelebA(
             root=str(celeba_dir),
             split='all',  # Download all images
             download=True
         )
         
-        print(f'\nDataset downloaded successfully!')
+        print(f'\n' + '='*70)
+        print('Download Complete!')
+        print('='*70)
         print(f"Location: {celeba_dir / 'celeba'}")
-        print(f'Number of images: {len(dataset)}')
-        print('\nYou can now add this to your config.yaml:')
+        print(f'Number of images: {len(dataset):,}')
+        print('\nAdd this path to your config.yaml:')
         print(f"  dataset_path: {celeba_dir / 'celeba' / 'img_align_celeba'}")
+        print('='*70)
         
         return True
         
     except ImportError:
-        print('\ntorchvision not available for automatic download.')
-        print('Please download manually as described above.')
+        print('\nERROR: torchvision is not installed!')
+        print('Install it with: pip install torchvision')
         return False
     except Exception as e:
-        print(f'\nError during download: {e}')
-        print('Please download manually as described above.')
+        print(f'\nERROR: Download failed: {e}')
+        print('\nTroubleshooting:')
+        print('  - Check your internet connection')
+        print('  - Ensure you have enough disk space (~1.5 GB)')
+        print('  - Try running the script again')
         return False
 
 
@@ -88,11 +66,14 @@ def verify_dataset(dataset_path):
     
     Args:
         dataset_path: Path to dataset directory
+        
+    Returns:
+        True if valid, False otherwise
     """
     dataset_path = Path(dataset_path)
     
     if not dataset_path.exists():
-        print(f'Error: Dataset path does not exist: {dataset_path}')
+        print(f'ERROR: Dataset path does not exist: {dataset_path}')
         return False
     
     # Count image files
@@ -100,16 +81,16 @@ def verify_dataset(dataset_path):
     num_images = len(image_files)
     
     if num_images == 0:
-        print(f'Error: No images found in {dataset_path}')
+        print(f'ERROR: No images found in {dataset_path}')
         return False
     
     print(f'\nDataset verification:')
     print(f'  Path: {dataset_path}')
-    print(f'  Number of images: {num_images}')
+    print(f'  Number of images: {num_images:,}')
     
     if num_images < 100:
-        print(f'  Warning: Very small dataset ({num_images} images)')
-        print(f'  CelebA should have ~200,000 images')
+        print(f'  WARNING: Very small dataset ({num_images} images)')
+        print(f'  CelebA should have ~202,599 images')
         return False
     
     print(f'  ✓ Dataset looks good!')
@@ -125,7 +106,7 @@ def main():
         '--output-dir',
         type=str,
         default='./data',
-        help='Output directory for dataset'
+        help='Output directory for dataset (default: ./data)'
     )
     parser.add_argument(
         '--verify',
@@ -137,9 +118,11 @@ def main():
     args = parser.parse_args()
     
     if args.verify:
-        verify_dataset(args.verify)
+        success = verify_dataset(args.verify)
+        sys.exit(0 if success else 1)
     else:
-        download_celeba(args.output_dir)
+        success = download_celeba(args.output_dir)
+        sys.exit(0 if success else 1)
 
 
 if __name__ == '__main__':

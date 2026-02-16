@@ -84,7 +84,7 @@ GANNs-with-freinds/
    ```bash
    python scripts/download_celeba.py
    ```
-   Or download manually from [Kaggle](https://www.kaggle.com/datasets/jessicali9530/celeba-dataset) and extract to `./data/celeba/`
+   This will automatically download the dataset using torchvision (~1.4 GB)
 
 5. **Configure database connection**
    ```bash
