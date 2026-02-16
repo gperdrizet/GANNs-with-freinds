@@ -44,6 +44,7 @@ GANNs-with-freinds/
 │   │   └── init_db.py            # Database initialization
 │   ├── worker.py                 # Worker process (students run this)
 │   ├── main.py                   # Main coordinator (instructor runs this)
+│   ├── train_local.py            # Local single-GPU training (no database)
 │   └── utils.py                  # Helper functions
 ├── scripts/
 │   └── download_celeba.py        # Dataset download script
@@ -97,6 +98,31 @@ GANNs-with-freinds/
    ```
 
    Your GPU is now part of the training cluster! 🎉
+
+### Alternative: Local Training (Single GPU)
+
+Want to train the same model locally without the distributed setup? Great for experimentation and comparison!
+
+1. **Follow setup steps 1-4 above** (skip database configuration)
+
+2. **Start local training**
+   ```bash
+   cd src
+   python train_local.py --epochs 50 --batch-size 128
+   ```
+
+   Arguments:
+   - `--epochs`: Number of epochs (default: 50)
+   - `--batch-size`: Batch size (default: 128)
+   - `--dataset-path`: Path to dataset (default: ../data/celeba)
+   - `--output-dir`: Output directory (default: outputs_local)
+   - `--sample-interval`: Generate samples every N epochs (default: 1)
+   - `--checkpoint-interval`: Save checkpoint every N epochs (default: 5)
+   - `--resume`: Resume from checkpoint path
+
+3. **Monitor progress**
+   - Generated samples: `outputs_local/samples/`
+   - Checkpoints: `outputs_local/checkpoints/`
 
 ### For Instructor (Main Coordinator)
 
@@ -250,7 +276,51 @@ python init_db.py
 # Test utilities
 cd src
 python utils.py
+
+# Test local training (quick 1-epoch test)
+cd src
+python train_local.py --epochs 1
 ```
+
+## 🔄 Distributed vs Local Training
+
+### When to Use Distributed (Main + Workers)
+✅ **Educational focus** - Learn distributed systems concepts  
+✅ **Collaborative project** - Entire class working together  
+✅ **Demonstrate real-world** - How large-scale training works  
+✅ **Limited individual resources** - Pool multiple GPUs  
+
+**Trade-offs:**
+- ⚠️ Network overhead (database I/O)
+- ⚠️ Coordination complexity
+- ⚠️ Requires database setup
+
+### When to Use Local Training
+✅ **Quick experimentation** - Test hyperparameters  
+✅ **Solo learning** - Practice GANs independently  
+✅ **Baseline comparison** - Compare distributed efficiency  
+✅ **Faster iteration** - No network/coordination overhead  
+
+**Trade-offs:**
+- ⚠️ Limited to single GPU
+- ⚠️ Misses distributed systems lessons
+
+### Performance Comparison
+```
+Distributed (10 workers, batch=32 each):
+- Effective batch size: ~320 (varies by workers available)
+- Time per iteration: ~15-30s (includes DB overhead)
+- Total training: ~4-5 hours
+- Educational value: ⭐⭐⭐⭐⭐
+
+Local (1 GPU, batch=128):
+- Effective batch size: 128
+- Time per iteration: ~2-5s (no overhead)
+- Total training: ~3-4 hours
+- Educational value: ⭐⭐⭐ (GANs only)
+```
+
+**Both produce similar quality results!** The distributed approach teaches more concepts.
 
 ## 📈 Expected Results
 

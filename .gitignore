@@ -27,6 +27,8 @@ data/celeba_torchvision/
 # Generated outputs
 outputs/samples/
 outputs/checkpoints/
+outputs_local/samples/
+outputs_local/checkpoints/
 
 # IDE
 .vscode/

@@ -17,6 +17,7 @@ bash scripts/setup.sh
 # OR do it manually:
 pip install -r requirements.txt
 cp config/config.yaml.template config/config.yaml
+
 # Edit config/config.yaml with database credentials
 python scripts/download_celeba.py
 ```
@@ -45,6 +46,60 @@ python dataset.py ../../data/celeba
 
 # Check worker logs
 # Look for "Processing work unit..." messages
+```
+
+## Local Training (Single GPU)
+
+### Quick Start
+```bash
+cd src
+python train_local.py --epochs 50 --batch-size 128
+```
+
+### Common Commands
+```bash
+# Train with custom settings
+python train_local.py --epochs 100 --batch-size 64 --lr 0.0001
+
+# Resume from checkpoint
+python train_local.py --resume outputs_local/checkpoints/checkpoint_latest.pth
+
+# Train with smaller batches (for low VRAM)
+python train_local.py --batch-size 32
+
+# Quick test run (1 epoch)
+python train_local.py --epochs 1 --sample-interval 1
+```
+
+### Monitoring
+```bash
+# Watch for new samples
+ls -ltr outputs_local/samples/
+
+# Check checkpoints
+ls -ltr outputs_local/checkpoints/
+```
+
+### Quick Comparison Test
+```bash
+# Run the comparison helper script
+bash scripts/compare_training.sh
+
+# Or manually test local training (1 epoch)
+cd src
+python train_local.py --epochs 1 --batch-size 64
+```
+
+### Performance Comparison
+```bash
+# Distributed: Multiple GPUs working together
+# - Slower per-iteration (network overhead)
+# - Educational: Learn distributed systems
+
+# Local: Single GPU standard training  
+# - Faster per-iteration (no network)
+# - Baseline for comparison
+# - Good for experimentation
 ```
 
 ## For Instructor (Main Coordinator)
@@ -150,23 +205,40 @@ Important files:
 | Issue | Solution |
 |-------|----------|
 | Can't connect to DB | Check config.yaml credentials |
-| Out of memory | Reduce batch_size in config.yaml |
+| Out of memory | Reduce batch_size in config.yaml or command line |
 | No work available | Wait for main process to create work units |
 | Worker not updating | Check heartbeat in database |
 | Slow training | Need more workers or larger batches |
+| Local training OOM | Use smaller batch size: `--batch-size 32` |
+| Local training slow | Reduce num_workers: `--num-workers 2` |
 
 ## Performance Tuning
 
-### If You Have Low VRAM (4-6GB)
+### Distributed Training - If You Have Low VRAM (4-6GB)
 ```yaml
 training:
   batch_size: 16  # Reduce from 32
 ```
 
-### If You Have High VRAM (12GB+)
+### Distributed Training - If You Have High VRAM (12GB+)
 ```yaml
 training:
   batch_size: 64  # Increase from 32
+```
+
+### Local Training - Batch Size Guide
+```bash
+# Low VRAM (4-6GB)
+python train_local.py --batch-size 32
+
+# Medium VRAM (8-10GB)  
+python train_local.py --batch-size 64
+
+# High VRAM (12GB+)
+python train_local.py --batch-size 128
+
+# Very High VRAM (24GB+)
+python train_local.py --batch-size 256
 ```
 
 ### If Database is Slow
