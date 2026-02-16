@@ -1,5 +1,40 @@
 
 __pycache__
-data
-logs
-models
+data/
+logs/
+models/
+outputs/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+*.pkl
+*.pth
+*.ckpt
+
+# Config with credentials
+config/config.yaml
+
+# Dataset
+data/celeba/
+data/celeba_torchvision/
+
+# Generated outputs
+outputs/samples/
+outputs/checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
