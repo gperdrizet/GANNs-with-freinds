@@ -28,10 +28,11 @@ This project demonstrates distributed machine learning by:
 - Stores model weights, gradients, work units
 - Acts as communication hub (no port forwarding needed!)
 - Tracks worker statistics for monitoring
+- **Note**: instructor/admin needs to set-up student-accessible SQL database
 
 ## Documentation
 
-**[📚 Full documentation](https://gperdrizet.github.io/GANNs-with-freinds/)** (coming soon)
+**[Full documentation](https://gperdrizet.github.io/GANNs-with-freinds/)** (coming soon)
 
 Quick links:
 - [Getting Started](docs/getting-started/overview.md) - Introduction and concepts
