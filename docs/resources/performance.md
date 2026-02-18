@@ -14,7 +14,7 @@ training:
   batch_size: 128  # Increase for better GPU utilization (watch for OOM)
 ```
 
-Check GPU utilization:
+**Check GPU utilization in a separate terminal:**
 ```bash
 watch -n 1 nvidia-smi
 # GPU usage should be >80%
@@ -32,11 +32,11 @@ training:
 Adjust parallel data loading:
 ```yaml
 data:
-  num_workers_dataloader: 8  # Set based on CPU cores
+  num_workers_dataloader: 4  # Default: 4, adjust based on CPU cores
 ```
 
 **Guidelines:**
-- GPU: 4-8 workers (more if you have cores available)
+- GPU: 4-8 workers (4 is a good default, increase if you have cores available)
 - CPU: 0-2 workers (to avoid overhead)
 
 ### Work Unit Configuration
@@ -131,6 +131,15 @@ If work units take too long to claim or complete:
 - See [Troubleshooting](troubleshooting.md)
 
 ## Example Configurations
+
+**Note:** Default settings in `config.yaml.template`:
+- `batch_size: 32`
+- `batches_per_work_unit: 10`
+- `num_workunits_per_update: 3`
+- `num_workers_dataloader: 4`
+- `poll_interval: 5`
+
+These examples show how to adjust for different class sizes:
 
 ### Small class (3-5 workers)
 ```yaml

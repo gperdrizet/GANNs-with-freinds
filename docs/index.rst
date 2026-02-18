@@ -42,6 +42,12 @@ Welcome to the documentation for **GANNs with friends** - an educational distrib
 
 .. toctree::
    :maxdepth: 2
+   :caption: Development approach
+
+   development-approach
+
+.. toctree::
+   :maxdepth: 2
    :caption: Features
 
    features/distributed-training

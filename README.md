@@ -55,11 +55,9 @@ Choose your installation path:
 | **Conda** | Conda users | Optional | [Setup guide](docs/setup/conda.md) |
 | **Local Training** | Single GPU, no database | Optional | [Setup guide](docs/setup/local-training.md) |
 
-**New to the project?** Start with the [Getting Started Guide](docs/getting-started/overview.md).
-
-**For students:** See the [Student Guide](docs/guides/students.md) for how to participate as a worker.
-
-**For instructors:** See the [Instructor Guide](docs/guides/instructors.md) for running the coordinator and managing training.
+- **New to the project?** Start with the [Getting Started Guide](docs/getting-started/overview.md).
+- **For students:** See the [Student Guide](docs/guides/students.md) for how to participate as a worker.
+- **For instructors:** See the [Instructor Guide](docs/guides/instructors.md) for running the coordinator and managing training.
 
 ## Features
 
