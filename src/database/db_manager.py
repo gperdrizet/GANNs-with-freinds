@@ -33,6 +33,9 @@ class DatabaseManager:
             db_url,
             poolclass=NullPool,  # No connection pooling for simplicity
             pool_pre_ping=True,  # Verify connections before using
+            connect_args={
+                'options': '-c statement_timeout=0'  # Disable statement timeout
+            }
         )
         self.SessionLocal = sessionmaker(bind=self.engine)
     

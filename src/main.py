@@ -10,6 +10,7 @@ from datetime import datetime
 
 import torch
 import torch.optim as optim
+from sqlalchemy.exc import OperationalError
 
 from models.dcgan import Generator, Discriminator
 from data.dataset import CelebADataset, get_dataset_indices
@@ -32,7 +33,8 @@ class MainCoordinator:
             config_path: Path to configuration file
             gpu_id: GPU device ID to use (default: 0)
         """
-        print('Initializing main coordinator...')
+
+        print('\nInitializing main coordinator...')
         
         # Load configuration
         self.config = load_config(config_path)
@@ -52,11 +54,13 @@ class MainCoordinator:
             root_dir=self.config['data']['dataset_path'],
             image_size=self.config['training']['image_size']
         )
+
         self.dataset_size = len(dataset)
         print(f'Dataset size: {self.dataset_size}')
         
         # Initialize models
         print('Initializing models...')
+
         self.generator = Generator(
             latent_dim=self.config['training']['latent_dim']
         ).to(self.device)
@@ -100,9 +104,11 @@ class MainCoordinator:
             print(f'Hugging Face Hub integration enabled: {self.hf_repo_id}')
         
         print('Main coordinator initialized successfully!')
-    
+
+
     def initialize_training(self):
         """Initialize training state in database."""
+
         print('\nInitializing training state...')
         
         # Save initial model weights
@@ -124,12 +130,14 @@ class MainCoordinator:
         
         print('Training state initialized!')
     
+
     def create_work_units_for_iteration(self, iteration: int):
         """Create work units for current iteration.
         
         Args:
             iteration: Current training iteration
         """
+
         # Split dataset into work units
         work_units_indices = get_dataset_indices(
             self.dataset_size,
@@ -146,8 +154,10 @@ class MainCoordinator:
         )
         
         print(f'Created {len(work_unit_ids)} work units for iteration {iteration}')
+        
         return len(work_unit_ids)
-    
+
+
     def wait_for_gradients(self, iteration: int, total_work_units: int):
         """Wait for gradients from workers.
         
@@ -158,35 +168,46 @@ class MainCoordinator:
         Returns:
             True if enough gradients collected, False if should stop
         """
+    
         print(f'\nWaiting for workers to compute gradients...')
         
         last_update = time.time()
         update_interval = 10  # Print status every 10 seconds
         
         while True:
-            # Check work unit completion status
-            stats = self.db.get_work_unit_stats(iteration)
-            completed = stats['completed']
-            total = stats['total']
+            try:
+                # Check work unit completion status
+                stats = self.db.get_work_unit_stats(iteration)
+                completed = stats['completed']
+                total = stats['total']
+                
+                # Print status update
+                current_time = time.time()
+
+                if current_time - last_update > update_interval:
+                    active_workers = self.db.get_active_workers()
+                    print(f'Progress: {completed}/{total} work units completed | '
+                          f'Active workers: {len(active_workers)}')
+                    last_update = current_time
+                
+                # Check if all work units are completed
+                if completed >= total:
+                    print(f'All work units completed for iteration {iteration}')
+                    return True
+                
+                # Check if we have minimum number of work unit gradients
+                gen_gradients = self.db.get_gradients_for_iteration('generator', iteration)
+
+                if len(gen_gradients) >= self.min_workunits_per_update:
+                    print(f'Minimum threshold reached: {len(gen_gradients)} work unit gradients collected')
+                    return True
             
-            # Print status update
-            current_time = time.time()
-            if current_time - last_update > update_interval:
-                active_workers = self.db.get_active_workers()
-                print(f'Progress: {completed}/{total} work units completed | '
-                      f'Active workers: {len(active_workers)}')
-                last_update = current_time
-            
-            # Check if all work units are completed
-            if completed >= total:
-                print(f'All work units completed for iteration {iteration}')
-                return True
-            
-            # Check if we have minimum number of work unit gradients
-            gen_gradients = self.db.get_gradients_for_iteration('generator', iteration)
-            if len(gen_gradients) >= self.min_workunits_per_update:
-                print(f'Minimum threshold reached: {len(gen_gradients)} work unit gradients collected')
-                return True
+            except OperationalError as e:
+                # Handle database timeout - just retry
+                if 'statement timeout' in str(e).lower() or 'QueryCanceled' in str(e):
+                    print('Database query timed out, retrying...')
+                else:
+                    raise  # Re-raise if it's a different operational error
             
             # Sleep before checking again
             time.sleep(2)
@@ -197,6 +218,7 @@ class MainCoordinator:
         Args:
             iteration: Current training iteration
         """
+
         print('\nAggregating gradients...')
         
         # Get gradients from database
