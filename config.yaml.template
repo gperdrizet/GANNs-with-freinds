@@ -2,7 +2,7 @@
 
 database:
   host: YOUR_DATABASE_HOST  # Provided by instructor
-  port: 5432
+  port: 54321
   database: distributed_gan
   user: YOUR_DATABASE_USER  # Provided by instructor
   password: YOUR_DATABASE_PASSWORD  # Provided by instructor
