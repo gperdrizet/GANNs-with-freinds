@@ -103,7 +103,7 @@ def verify_dataset(dataset_path):
         print(f'  CelebA should have ~202,599 images')
         return False
     
-    print(f'  ✓ Dataset looks good!')
+    print(f'  Dataset looks good!')
     return True
 
 
